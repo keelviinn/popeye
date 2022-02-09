@@ -1,6 +1,4 @@
-import fs from 'fs';
-import path from 'path';
-import * as express from 'express';
+import express from 'express';
 import * as cors from 'cors';
 import { createServer } from 'http';
 import { Server as ioServer } from 'socket.io'
@@ -14,17 +12,12 @@ const PORT = process.env.PORT || 3333;
 const corsOptions = { origin:'*' };
 
 const app = express();
-app.use(cors(corsOptions))
+// app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const server = createServer(app);
-const io = new ioServer(server, {
-  cors: {
-    ...corsOptions,
-    credentials: false
-  }
-});
+const io = new ioServer(server, { cors: { ...corsOptions, credentials: false } });
 
 let interval = 5;
 
@@ -32,7 +25,7 @@ io.on("connection", (socket) => {
   console.log(`New client connected: ${socket.id}`);
 
   socket.on("start-navigation", async ({ time, routeLabel }) => {
-    const { type, features } = await GeoLocation.findOne({ label: routeLabel });
+    const { type, features }: any = await GeoLocation.findOne({ label: routeLabel });
 
     if (type && features) {
       const coordinates = features[0].geometry.coordinates;
@@ -56,7 +49,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on("get-geolocation", ({ routeLabel }) => {
-    GeoLocation.findOne({ label: routeLabel }).then(({type, features}) => {
+    GeoLocation.findOne({ label: routeLabel }).then(({type, features}: any) => {
       if (type && features) {
         socket.emit("set-geolocation", { type, features });
         socket.emit("set-position", features[0].geometry.coordinates[0]);
@@ -93,11 +86,10 @@ const seedDatabase = async () => {
 server.listen(PORT, async () => {
   console.log(`Listening on: http://localhost:${PORT}`);
   try {
-    await connect('mongodb://root:root@127.0.0.1:27017', {});
+    await connect('mongodb://popeye:popeye@127.0.0.1:27017/', {});
     await seedDatabase();
     console.log("Connected to the database");
   } catch (error) {
     console.error(error)
   }
 });
-

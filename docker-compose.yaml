@@ -1,0 +1,42 @@
+version: "3.9"
+services:
+  # client:
+  #   container_name: frontend
+  #   stdin_open: true
+  #   build:
+  #     context: ./frontend
+  #   depends_on:
+  #     - server
+  #   volumes:
+  #     - ./frontend:/app/frontend
+  #   ports:
+  #     - 4000:4000
+
+  server:
+    container_name: server
+    stdin_open: true
+    build:
+      context: ./server
+    depends_on:
+      - database
+    volumes:
+      - ./server:/app/server
+    ports:
+      - 3333:3333
+    environment:
+      - PORT=3333
+      - MONGO_URI=mongodb://database:27017/popeye
+    links:
+      - database
+
+  database:
+    image: mongo:latest
+    container_name: database
+    ports:
+      - 27017:27017
+    volumes:
+      - db:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=popeye
+volumes:
+  db:
