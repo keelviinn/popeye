@@ -5,7 +5,7 @@ WORKDIR /app/server
 COPY package.json ./
 COPY yarn.lock ./
 
-RUN yarn
+RUN yarn && yarn build
 
 COPY . .
 
