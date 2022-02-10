@@ -5,10 +5,10 @@ WORKDIR /app/server
 COPY package.json ./
 COPY yarn.lock ./
 
-RUN yarn && yarn build
+RUN yarn
 
 COPY . .
 
 EXPOSE 3333
 
-CMD ["yarn", "start"]
+CMD ["yarn", "dev"]
