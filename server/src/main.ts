@@ -67,7 +67,7 @@ io.on("connection", (socket) => {
 server.listen(PORT, async () => {
   console.log(`Listening on: http://localhost:${PORT}`);
   try {
-    await connect('mongodb://localhost:27017/popeye', {});
+    await connect('mongodb://database:27017/popeye', {});
     await seedDatabase();
     console.log("Connected to the database");
   } catch (error) {
