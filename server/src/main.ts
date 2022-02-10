@@ -1,18 +1,16 @@
 import express from 'express';
-import * as cors from 'cors';
+import cors from 'cors';
 import { createServer } from 'http';
 import { Server as ioServer } from 'socket.io'
 import { connect } from 'mongoose';
 import { GeoLocation } from './models';
-
-import * as popeyeVillageBalluta from './assets/popeye-village-balluta.json';
-import * as lunch from './assets/lunch.json';
+import { seedDatabase } from './db/seedDatabase';
 
 const PORT = process.env.PORT || 3333;
 const corsOptions = { origin:'*' };
 
 const app = express();
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -23,6 +21,18 @@ let interval = 5;
 
 io.on("connection", (socket) => {
   console.log(`New client connected: ${socket.id}`);
+
+  socket.on("get-geolocation", ({ routeLabel }) => {
+    GeoLocation.findOne({ label: routeLabel }).then(({type, features}: any) => {
+      if (type && features) {
+        socket.emit("set-geolocation", { type, features });
+        socket.emit("set-position", features[0].geometry.coordinates[0]);
+        interval = 0;
+      }
+    });
+  })
+
+  socket.on("set-time", ({ time }) => { interval = time });
 
   socket.on("start-navigation", async ({ time, routeLabel }) => {
     const { type, features }: any = await GeoLocation.findOne({ label: routeLabel });
@@ -48,40 +58,11 @@ io.on("connection", (socket) => {
     }
   })
 
-  socket.on("get-geolocation", ({ routeLabel }) => {
-    GeoLocation.findOne({ label: routeLabel }).then(({type, features}: any) => {
-      if (type && features) {
-        socket.emit("set-geolocation", { type, features });
-        socket.emit("set-position", features[0].geometry.coordinates[0]);
-        interval = 0;
-      }
-    });
-  })
-
-  socket.on("set-time", ({ time }) => { interval = time });
-
   socket.on("disconnect", () => {
     console.log(`Client disconnected: ${socket.id}`);
     clearInterval(interval);
   });
 });
-
-const seedDatabase = async () => {
-  if (!await GeoLocation.findOne({ label: "Go to work" })) {
-    await GeoLocation.create({ label: "Go to work", ...popeyeVillageBalluta })
-    console.log("Database seeded: Go to work");
-  }
-  if (!await GeoLocation.findOne({ label: "Go to lunch" })) {
-    await GeoLocation.create({ label: "Go to lunch", ...lunch })
-    console.log("Database seeded: Go to lunch");
-  }
-  if (!await GeoLocation.findOne({ label: "Go to home" })) {
-    const coordinates = popeyeVillageBalluta.features[0].geometry.coordinates.reverse();
-    const returnRoute = { ...popeyeVillageBalluta, features: [{ ...popeyeVillageBalluta.features[0], geometry: { type: "LineString", coordinates } }] };
-    await GeoLocation.create({ label: "Go to home", ...returnRoute });
-    console.log("Database seeded: Go to home");
-  }
-}
 
 server.listen(PORT, async () => {
   console.log(`Listening on: http://localhost:${PORT}`);

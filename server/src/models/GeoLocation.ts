@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import * as I from '../interfaces';
+import { GeoLocationInterface } from '../interfaces';
 
 const GeoLocationSchema: Schema = new Schema({
 	label: { type: String },
@@ -7,4 +7,4 @@ const GeoLocationSchema: Schema = new Schema({
   features: { type: Object }
 }, { timestamps: true});
 
-export const GeoLocation = model<I.GeoLocation>('GeoLocation', GeoLocationSchema);
+export const GeoLocation = model<GeoLocationInterface>('GeoLocation', GeoLocationSchema);

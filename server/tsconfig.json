@@ -1,8 +1,13 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    "allowJs": true,
+    "skipLibCheck": true,
     "esModuleInterop": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "target": "es6",
+    "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "moduleResolution": "node",
     "sourceMap": true,
@@ -17,6 +22,7 @@
     }
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "test/**/*"
   ]
 }
