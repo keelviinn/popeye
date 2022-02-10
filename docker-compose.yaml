@@ -1,16 +1,16 @@
 version: "3.9"
 services:
-  # client:
-  #   container_name: frontend
-  #   stdin_open: true
-  #   build:
-  #     context: ./frontend
-  #   depends_on:
-  #     - server
-  #   volumes:
-  #     - ./frontend:/app/frontend
-  #   ports:
-  #     - 4000:4000
+  client:
+    container_name: client
+    stdin_open: true
+    build:
+      context: ./client
+    depends_on:
+      - server
+    volumes:
+      - ./client:/app/client
+    ports:
+      - 3000:3000
 
   server:
     container_name: server
