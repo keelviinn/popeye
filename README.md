@@ -1,6 +1,8 @@
 # Popeye Route
 ## Welcome to popeye balluta village
 
+![plot](./village.png)
+
 ## Features
 
 - Map Section with popeye real time movement.
